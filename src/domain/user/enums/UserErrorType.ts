@@ -28,7 +28,8 @@ export enum UserErrorType {
     EMAIL_REQUIRED = "Email is required to create an account.",
     LAST_NAME_REQUIRED = "First name is required to create an account.",
     FIRST_NAME_REQUIRED = "Last name is required to create an account.",
-    SAME_PASSWORD = ""
+    SAME_PASSWORD = "The password provided is the same.",
+    INVALID_USER_ID = "Invalid user id format."
 
 }
 
@@ -60,6 +61,7 @@ export const UserErrorHttpStatus: Record<UserErrorType, number> = {
     [UserErrorType.LAST_NAME_REQUIRED]: HttpStatusCodes.BAD_REQUEST,
     [UserErrorType.FIRST_NAME_REQUIRED]: HttpStatusCodes.BAD_REQUEST,
     [UserErrorType.SAME_PASSWORD]: HttpStatusCodes.BAD_REQUEST,
+    [UserErrorType.INVALID_USER_ID]: HttpStatusCodes.BAD_REQUEST
 };
 
 /**
