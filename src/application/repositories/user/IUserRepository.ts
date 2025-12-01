@@ -1,6 +1,7 @@
 import { CreateUserDTO } from "../../../domain/user/dtos/CreateUserDTO";
 import { User } from "../../../domain/user/entity/User";
 import { Email } from "../../../domain/user/valueObjects/Email";
+import { UserId } from "../../../domain/user/valueObjects/UserId";
 
 /**
  * Interface for User repository operations following Repository pattern
@@ -16,10 +17,10 @@ export interface IUserRepository {
 
     /**
      * Finds a user by ID
-     * @param {string} id - User ID
+     * @param {UserId} id - User ID
      * @returns {Promise<User | null>} The user or null if not found
      */
-    findById(id: string): Promise<User | null>;
+    findById(id: UserId): Promise<User | null>;
 
     /**
      * Finds a user by email address
@@ -44,10 +45,10 @@ export interface IUserRepository {
 
     /**
      * Deletes a user by ID
-     * @param {string} id - User ID
+     * @param {UserId} id - User ID
      * @returns {Promise<void>}
      */
-    delete(id: string): Promise<void>;
+    delete(id: UserId): Promise<void>;
 
     /**
      * Checks if a user with the given email already exists
