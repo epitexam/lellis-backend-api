@@ -1,5 +1,6 @@
 import { CreateUserDTO } from "../../../domain/user/dtos/CreateUserDTO";
 import { User } from "../../../domain/user/entity/User";
+import { UserStatus } from "../../../domain/user/enums/UserStatus";
 import { Email } from "../../../domain/user/valueObjects/Email";
 import { UserId } from "../../../domain/user/valueObjects/UserId";
 
@@ -35,6 +36,20 @@ export interface IUserRepository {
      * @returns {Promise<User>} The saved user
      */
     save(user: User): Promise<User>;
+
+    /**
+       * Searches users with filtering, sorting and pagination.
+       * @param query Search and pagination criteria
+       * @returns Users and total count
+       */
+    search(query: {
+        search?: string;
+        status?: UserStatus;
+        sortBy: string;
+        sortOrder: "asc" | "desc";
+        offset: number;
+        limit: number;
+    }): Promise<{ users: User[]; total: number }>;
 
     /**
      * Updates a user entity
