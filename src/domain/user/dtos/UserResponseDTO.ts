@@ -1,5 +1,6 @@
 import { User } from "../entity/User";
 import { UserStatus } from "../enums/UserStatus";
+import { UserId } from "../valueObjects/UserId";
 
 /**
  * Data Transfer Object for user response (without sensitive data)
@@ -7,7 +8,7 @@ import { UserStatus } from "../enums/UserStatus";
  */
 export class UserResponseDTO {
     /**
-     * @param {string} id - User ID
+     * @param {UserId} id - User ID
      * @param {string} email - User's email
      * @param {string} firstName - User's first name
      * @param {string} lastName - User's last name
@@ -18,7 +19,7 @@ export class UserResponseDTO {
      * @param {Date} updatedAt - Last update timestamp
      */
     constructor(
-        public readonly id: string,
+        public readonly id: UserId,
         public readonly email: string,
         public readonly firstName: string,
         public readonly lastName: string,

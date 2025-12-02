@@ -1,6 +1,8 @@
 import { CreateUserDTO } from "../../../domain/user/dtos/CreateUserDTO";
 import { User } from "../../../domain/user/entity/User";
+import { UserStatus } from "../../../domain/user/enums/UserStatus";
 import { Email } from "../../../domain/user/valueObjects/Email";
+import { UserId } from "../../../domain/user/valueObjects/UserId";
 
 /**
  * Interface for User repository operations following Repository pattern
@@ -16,10 +18,10 @@ export interface IUserRepository {
 
     /**
      * Finds a user by ID
-     * @param {string} id - User ID
+     * @param {UserId} id - User ID
      * @returns {Promise<User | null>} The user or null if not found
      */
-    findById(id: string): Promise<User | null>;
+    findById(id: UserId): Promise<User | null>;
 
     /**
      * Finds a user by email address
@@ -36,6 +38,20 @@ export interface IUserRepository {
     save(user: User): Promise<User>;
 
     /**
+       * Searches users with filtering, sorting and pagination.
+       * @param query Search and pagination criteria
+       * @returns Users and total count
+       */
+    search(query: {
+        search?: string;
+        status?: UserStatus;
+        sortBy: string;
+        sortOrder: "asc" | "desc";
+        offset: number;
+        limit: number;
+    }): Promise<{ users: User[]; total: number }>;
+
+    /**
      * Updates a user entity
      * @param {User} user - User entity to update
      * @returns {Promise<User>} The updated user
@@ -44,10 +60,10 @@ export interface IUserRepository {
 
     /**
      * Deletes a user by ID
-     * @param {string} id - User ID
+     * @param {UserId} id - User ID
      * @returns {Promise<void>}
      */
-    delete(id: string): Promise<void>;
+    delete(id: UserId): Promise<void>;
 
     /**
      * Checks if a user with the given email already exists

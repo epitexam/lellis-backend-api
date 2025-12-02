@@ -6,18 +6,16 @@
  * @entity
  * @domain User
  */
-
 import { UserError, UserErrorType } from "../enums/UserErrorType";
 import { UserStatus } from "../enums/UserStatus";
 import { Email } from "../valueObjects/Email";
 import { Password } from "../valueObjects/Password";
+import { UserId } from "../valueObjects/UserId";
 
 export class User {
-    // Immutable identifiers
-    public readonly id: string;
+    public readonly id: UserId;
     public readonly createdAt: Date;
 
-    // Mutable but protected domain properties
     private _email: Email;
     private _password: Password;
     private _firstName: string;
@@ -27,9 +25,8 @@ export class User {
     private _status: UserStatus;
     private _updatedAt: Date;
 
-    // Private constructor → creation only via factory methods
     private constructor(
-        id: string,
+        id: UserId,
         email: Email,
         password: Password,
         firstName: string,
@@ -50,41 +47,33 @@ export class User {
         this._status = status;
         this.createdAt = createdAt;
         this._updatedAt = updatedAt;
+
+        this.validateState();
     }
 
-    /** Factory for new user registration (preferred way) */
+    /** Factory for new user creation */
     public static create(props: {
-        id: string;
+        id: UserId;
         email: Email;
         password: Password;
         firstName: string;
         lastName: string;
     }): User {
-        if (!props.firstName?.trim()) {
-            throw new UserError(UserErrorType.FIRST_NAME_REQUIRED);
-        }
-        if (!props.lastName?.trim()) {
-            throw new UserError(UserErrorType.LAST_NAME_REQUIRED);
-        }
+        if (!props.firstName?.trim()) throw new UserError(UserErrorType.FIRST_NAME_REQUIRED);
+        if (!props.lastName?.trim()) throw new UserError(UserErrorType.LAST_NAME_REQUIRED);
 
-        const now = new Date();
         return new User(
             props.id,
             props.email,
             props.password,
             props.firstName,
-            props.lastName,
-            false,
-            null,
-            UserStatus.PENDING,
-            now,
-            now
+            props.lastName
         );
     }
 
-    /** Reconstitution from persistence (e.g. database) */
+    /** Reconstitution from persistence (DB, cache, etc.) */
     public static reconstitute(props: {
-        id: string;
+        id: UserId;
         email: Email;
         password: Password;
         firstName: string;
@@ -119,16 +108,12 @@ export class User {
     public get status(): UserStatus { return this._status; }
     public get updatedAt(): Date { return this._updatedAt; }
 
+    public getIdValue(): string { return this.id.toString(); }
+    public getEmailValue(): string { return this._email.getValue(); }
+    public getPasswordHash(): string { return this._password.getHash(); }
+
     public getFullName(): string {
         return `${this._firstName} ${this._lastName}`.trim();
-    }
-
-    public getEmailValue(): string {
-        return this._email.getValue();
-    }
-
-    public getPasswordHash(): string {
-        return this._password.getHash();
     }
 
     public isActive(): boolean {
@@ -142,9 +127,10 @@ export class User {
     }
 
     public activate(): void {
-        if (this._status === UserStatus.ACTIVE) return;
-        this._status = UserStatus.ACTIVE;
-        this.touch();
+        if (this._status !== UserStatus.ACTIVE) {
+            this._status = UserStatus.ACTIVE;
+            this.touch();
+        }
     }
 
     public updateProfile(updates: {
@@ -152,16 +138,26 @@ export class User {
         lastName?: string;
         email?: Email;
     }): void {
-        if (updates.firstName?.trim()) this._firstName = updates.firstName.trim();
-        if (updates.lastName?.trim()) this._lastName = updates.lastName.trim();
+        if (updates.firstName?.trim()) {
+            this._firstName = updates.firstName.trim();
+        }
+
+        if (updates.lastName?.trim()) {
+            this._lastName = updates.lastName.trim();
+        }
+
         if (updates.email && !updates.email.equals(this._email)) {
             this._email = updates.email;
         }
-        this.touch();
+
+        if (updates.firstName || updates.lastName || updates.email) {
+            this.validateState();
+            this.touch();
+        }
     }
 
     public changePassword(newPassword: Password): void {
-        if (newPassword.getHash() === this._password.getHash()) {
+        if (newPassword.equals(this._password)) {
             throw new UserError(UserErrorType.SAME_PASSWORD);
         }
         this._password = newPassword;
@@ -169,19 +165,44 @@ export class User {
     }
 
     public enableMfa(): void {
-        if (this._mfaEnabled) return;
-        this._mfaEnabled = true;
-        this.touch();
+        if (!this._mfaEnabled) {
+            this._mfaEnabled = true;
+            this.touch();
+        }
     }
 
     public disableMfa(): void {
-        if (!this._mfaEnabled) return;
-        this._mfaEnabled = false;
-        this.touch();
+        if (this._mfaEnabled) {
+            this._mfaEnabled = false;
+            this.touch();
+        }
     }
 
-    // ——— Private helpers ———
+    private validateState(): void {
+        if (!this._firstName.trim()) {
+            throw new UserError(UserErrorType.FIRST_NAME_REQUIRED);
+        }
+
+        if (!this._lastName.trim()) {
+            throw new UserError(UserErrorType.LAST_NAME_REQUIRED);
+        }
+    }
+
     private touch(): void {
         this._updatedAt = new Date();
+    }
+
+    public toJSON(): object {
+        return {
+            id: this.getIdValue(),
+            email: this.getEmailValue(),
+            firstName: this.firstName,
+            lastName: this.lastName,
+            mfaEnabled: this.mfaEnabled,
+            lastLogin: this.lastLogin,
+            status: this.status,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        };
     }
 }
