@@ -1,5 +1,5 @@
 import { UserId } from "../../user/valueObjects/UserId";
-import { RefreshTokenError, RefreshTokenErrorType } from "../enums/RefreshTokenErrorType";
+import { TokenError, TokenErrorType } from "../enums/TokenErrorType";
 
 /**
  * @file RefreshToken.ts
@@ -82,7 +82,7 @@ export class RefreshToken {
     ): RefreshToken {
         if (!id || !tokenString || !userId || !(expiresAt instanceof Date) || expiresAt.getTime() <= issuedAt.getTime()) {
             // In a real application, throw a Domain/UserError here
-            throw new RefreshTokenError(RefreshTokenErrorType.INVALID_PARAMETERS)
+            throw new TokenError(TokenErrorType.INVALID_PARAMETERS)
         }
         return new RefreshToken(id, tokenString, userId, expiresAt, issuedAt, false);
     }
