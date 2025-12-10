@@ -1,82 +1,84 @@
-import { TokenError, TokenErrorType } from "../../domain/auth/enums/TokenErrorType";
 import { IJwtService } from "../../domain/auth/security/IJwtService";
+import { TokenError, TokenErrorType } from "../../domain/auth/enums/TokenErrorType";
 import { UserId } from "../../domain/user/valueObjects/UserId";
-import { decode, sign, verify } from 'hono/jwt'
-
-const ACCESS_TOKEN_EXPIRY_SECONDS = 3600;
-const REFRESH_TOKEN_EXPIRY_DAYS = Number(process.env.REFRESH_TOKEN_EXPIRY_DAYS) ||  7;
-
-const JWT_SECRET = process.env.JWT_SECRET || 'SECRET_DE_DEVELOPPEMENT_A_NE_PAS_UTILISER_EN_PROD';
+import { sign, verify } from "hono/jwt";
 
 /**
  * @class HonoJwtService
  * @implements {IJwtService}
- * @description Concrete implementation of the IJwtService port using Hono's JWT utilities.
- * This class belongs to the Infrastructure layer.
+ * @description Infrastructure implementation of the JWT generation and verification logic.
  */
 export class HonoJwtService implements IJwtService {
 
     /**
-     * @public
-     * @returns {Date} Calculates the expiration date for the Refresh Token 
+     * @param {string} secret - Signing secret for JWT.
+     * @param {number} accessTokenExpirySeconds - Lifetime of access tokens in seconds.
+     * @param {number} refreshTokenExpiryDays - Lifetime of refresh tokens in days.
      */
-    public getRefreshTokenExpirationDate(): Date {
-        const date = new Date();
-        date.setDate(date.getDate() + REFRESH_TOKEN_EXPIRY_DAYS);
-        return date;
-    }
+    constructor(
+        private readonly secret: string,
+        private readonly accessTokenExpirySeconds: number,
+        private readonly refreshTokenExpiryDays: number
+    ) { }
 
     /**
-     * @public
-     * @async
-     * @param {UserId} userId - The identifier of the user (Value Object).
-     * @returns {Promise<string>} The generated short-lived Access Token string.
+     * @inheritdoc
      */
     public async generateAccessToken(userId: UserId): Promise<string> {
-        const payload = {
-            sub: userId.toString(), // Conversion en string pour le JWT
-            exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRY_SECONDS,
-            iat: Math.floor(Date.now() / 1000)
-        };
-        return sign(payload, JWT_SECRET);
-    }
+        const now = Math.floor(Date.now() / 1000);
 
-    /**
-     * @public
-     * @async
-     * @param {UserId} userId - The identifier of the user (Value Object).
-     * @returns {Promise<string>} The generated long-lived Refresh Token string.
-     */
-    public async generateRefreshToken(userId: UserId): Promise<string> {
         const payload = {
             sub: userId.toString(),
-            iat: Math.floor(Date.now() / 1000)
+            iat: now,
+            exp: now + this.accessTokenExpirySeconds
         };
-        return sign(payload, JWT_SECRET);
+
+        return sign(payload, this.secret);
     }
 
     /**
-     * @public
-     * @async
-     * @param {string} token - The Access Token string provided by the client.
-     * @returns {Promise<{ userId: string }>} A promise resolving to the token's payload.
-     * @throws {TokenError} Throws an error if the token is invalid, expired, or malformed.
+     * @inheritdoc
+     */
+    public async generateRefreshToken(userId: UserId): Promise<string> {
+        const now = Math.floor(Date.now() / 1000);
+
+        const payload = {
+            sub: userId.toString(),
+            iat: now,
+            exp: now + this.refreshTokenExpiryDays * 86400
+        };
+
+        return sign(payload, this.secret);
+    }
+
+    /**
+     * @inheritdoc
      */
     public async verifyAccessToken(token: string): Promise<{ userId: string }> {
         try {
-            const payload = await verify(token, JWT_SECRET);
+            const payload = await verify(token, this.secret);
 
-            if (!payload || typeof payload.sub !== 'string') {
+            if (!payload || typeof payload.sub !== "string") {
                 throw new TokenError(TokenErrorType.INVALID_PAYLOAD);
             }
 
+            if (typeof payload.exp === "number" && payload.exp < Date.now() / 1000) {
+                throw new TokenError(TokenErrorType.EXPIRED_TOKEN);
+            }
 
             return { userId: payload.sub };
 
-        } catch (error) {
-            console.error("JWT Verification failed:", error);
-
+        } catch {
             throw new TokenError(TokenErrorType.INVALID_OR_EXPIRED_TOKEN);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getRefreshTokenExpirationDate(): Date {
+        const date = new Date();
+        date.setDate(date.getDate() + this.refreshTokenExpiryDays);
+        return date;
     }
 }
