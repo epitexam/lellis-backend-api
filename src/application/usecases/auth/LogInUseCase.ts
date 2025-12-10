@@ -55,8 +55,8 @@ export class LogInUseCase {
 
         const userId = existingUser!.id;
         const issueDate = new Date();
-        const accessToken = await this.jwtService.generateAccessToken(userId.toString());
-        const refreshTokenString = await this.jwtService.generateRefreshToken(userId.toString());
+        const accessToken = await this.jwtService.generateAccessToken(userId);
+        const refreshTokenString = await this.jwtService.generateRefreshToken(userId);
 
         const expirationDate = this.jwtService.getRefreshTokenExpirationDate();
         const tokenRecordId = this.idProvider.generateRandomUuid();
