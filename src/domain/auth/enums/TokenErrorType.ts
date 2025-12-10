@@ -5,8 +5,9 @@ import { DomainError, IDomainError } from "../../../application/interfaces/IDoma
  * Token-specific error types.
  */
 export enum TokenErrorType {
-    INVALID_PARAMETERS = "Invalid parameters provided for RefreshToken creation."
-
+    INVALID_PARAMETERS = "Invalid parameters provided for RefreshToken creation.",
+    INVALID_PAYLOAD = "Invalid payload",
+    INVALID_OR_EXPIRED_TOKEN = "The token provided is either invalid or expired"
 }
 
 /**
@@ -14,6 +15,8 @@ export enum TokenErrorType {
  */
 export const TokenErrorHttpStatus: Record<TokenErrorType, number> = {
     [TokenErrorType.INVALID_PARAMETERS]: HttpStatusCodes.BAD_REQUEST,
+    [TokenErrorType.INVALID_PAYLOAD]: HttpStatusCodes.BAD_REQUEST,
+    [TokenErrorType.INVALID_OR_EXPIRED_TOKEN]: HttpStatusCodes.UNAUTHORIZED
 };
 
 /**
