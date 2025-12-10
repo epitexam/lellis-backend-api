@@ -7,7 +7,9 @@ import { DomainError, IDomainError } from "../../../application/interfaces/IDoma
 export enum TokenErrorType {
     INVALID_PARAMETERS = "Invalid parameters provided for RefreshToken creation.",
     INVALID_PAYLOAD = "Invalid payload",
-    INVALID_OR_EXPIRED_TOKEN = "The token provided is either invalid or expired"
+    INVALID_OR_EXPIRED_TOKEN = "The token provided is either invalid or expired",
+    EXPIRED_TOKEN = "The token provided as expired.",
+    REFRESH_TOKEN_NOT_FOUND = "Refresh token not found in the database."
 }
 
 /**
@@ -16,7 +18,9 @@ export enum TokenErrorType {
 export const TokenErrorHttpStatus: Record<TokenErrorType, number> = {
     [TokenErrorType.INVALID_PARAMETERS]: HttpStatusCodes.BAD_REQUEST,
     [TokenErrorType.INVALID_PAYLOAD]: HttpStatusCodes.BAD_REQUEST,
-    [TokenErrorType.INVALID_OR_EXPIRED_TOKEN]: HttpStatusCodes.UNAUTHORIZED
+    [TokenErrorType.INVALID_OR_EXPIRED_TOKEN]: HttpStatusCodes.UNAUTHORIZED,
+    [TokenErrorType.EXPIRED_TOKEN]: HttpStatusCodes.UNAUTHORIZED,
+    [TokenErrorType.REFRESH_TOKEN_NOT_FOUND]: HttpStatusCodes.NOT_FOUND
 };
 
 /**
