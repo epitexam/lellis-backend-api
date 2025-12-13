@@ -32,7 +32,7 @@ export class GetUserUseCase {
      */
     async execute(rawId: string): Promise<UserResponseDTO> {
         const userId = UserId.create(rawId);
-
+        
         const user = await this.userRepository.findById(userId);
 
         if (!user) {
