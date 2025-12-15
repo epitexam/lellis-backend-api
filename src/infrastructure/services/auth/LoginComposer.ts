@@ -5,14 +5,15 @@ import { IUserRepository } from "../../../application/repositories/user/IUserRep
 import { LogInUseCase } from "../../../application/usecases/auth/LogInUseCase";
 import { IJwtService } from "../../../domain/auth/security/IJwtService";
 import { RedisAuthRepository } from "../../database/auth/RedisAuthRepository";
-import { PrismaUserRepository } from "../../database/user/PrismaUserRepository";
+import { db } from "../../database/config/mysql";
+import { MySqlUserRepository } from "../../database/user/MySqlUserRepository";
 import { LoginController } from "../../http/hono/controllers/auth/LoginController";
 import { BunIdProvider } from "../../provider/BunIdProvider";
 import { BunPasswordHasher } from "../../provider/BunPasswordHasher";
 import { HonoJwtService } from "../../security/HonoJwtService";
 
 export function LoginComposer() {
-    const userRepository: IUserRepository = new PrismaUserRepository()
+    const userRepository: IUserRepository = new MySqlUserRepository(db)
     const authRepository: IAuthRepository = new RedisAuthRepository()
 
     const passwordHasher: IPasswordHasher = new BunPasswordHasher()
