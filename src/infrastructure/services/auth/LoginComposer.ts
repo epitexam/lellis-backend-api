@@ -18,7 +18,7 @@ export function LoginComposer() {
 
     const passwordHasher: IPasswordHasher = new BunPasswordHasher()
     const idProvider: IIdProvider = new BunIdProvider()
-    const jwtService: IJwtService = new HonoJwtService(process.env.SECRET || "", 3600, Number(process.env.DAYS) || 7)
+    const jwtService: IJwtService = new HonoJwtService(process.env.SECRET  || "test_secret_key_fixed_for_reproducible_tests_12345", 3600, Number(process.env.DAYS) || 7)
 
     const usecase = new LogInUseCase(userRepository, passwordHasher, jwtService, authRepository, idProvider)
 
