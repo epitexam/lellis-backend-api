@@ -22,10 +22,10 @@ interface UserRow {
 
 export class MySqlUserRepository implements IUserRepository {
   constructor(private readonly sql: SQL) { }
-  
+
   private toSqlDate(date: Date | null | undefined): string | null {
     if (!date) return null;
-    return date.toISOString().replace('T', ' ').replace('Z', '');
+    return date.toISOString().replace('T', ' ').replace('Z', '').slice(0, 23);
   }
 
   private mapToDomain(row: UserRow): User {
