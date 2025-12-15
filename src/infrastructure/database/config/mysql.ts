@@ -84,12 +84,30 @@ function monitorConnections(intervalMs: number): void {
         SHOW STATUS WHERE Variable_name IN ('Threads_connected', 'Max_used_connections')
       `;
 
-      const current = stats.find(s => s.Variable_name === 'Threads_connected')?.Value;
-      const peak = stats.find(s => s.Variable_name === 'Max_used_connections')?.Value;
+      const current = parseInt(stats.find(s => s.Variable_name === 'Threads_connected')?.Value || "0");
+      const peak = parseInt(stats.find(s => s.Variable_name === 'Max_used_connections')?.Value || "0");
+      const limit = parseInt(dbConfig.connectionLimit);
+      
+      const usagePercent = ((current / limit) * 100).toFixed(1);
+      const timestamp = new Date().toLocaleTimeString();
 
-      console.log(`[DB Monitor] ${new Date().toLocaleTimeString()} - Active: ${current} | Peak: ${peak}`);
+      console.log(`\n--- DATABASE HEALTH CHECK [${timestamp}] ---`);
+      console.log(`Target DB: ${dbConfig.database} | Host: ${dbConfig.host}`);
+      console.log(`Active Connections: ${current} / ${limit} (${usagePercent}% of App Pool)`);
+      console.log(`Description: Current active pipes between this Bun instance and MySQL.`);
+      
+      console.log(`Global Server Peak: ${peak}`);
+      console.log(`Description: Max concurrent connections recorded since MySQL started.`);
+
+      if (current >= limit * 0.8) {
+        console.warn(`CRITICAL: Pool is almost full! (${usagePercent}% used)`);
+      } else if (current > 0) {
+        console.log(`Status: Healthy (Connection pool is stable)`);
+      }
+      console.log("-----------------------------------------------\n");
+
     } catch (e) {
-      console.error("[DB Monitor] Connection lost or server unreachable.");
+      console.error(`\n[DB Monitor] ALERT [${new Date().toLocaleTimeString()}]: Connection lost or server unreachable.`);
     }
   }, intervalMs);
 }
