@@ -12,7 +12,10 @@ export enum TokenErrorType {
     REFRESH_TOKEN_NOT_FOUND = "Refresh token not found in the database.",
     ERROR_WHILE_GENERATING_ACCESS_TOKEN = "Error occured while generating access token.",
     ERROR_WHILE_GENERATING_REFRESH_TOKEN = "Error occured while generating refresh token.",
-    MISSING_SECRET = "Missing secret"
+    MISSING_SECRET = "Missing secret",
+    TOO_LONG_LIFETIME = "Token lifetime is too short for security requirements.",
+    TOO_SHORT_LIFETIME = "Token lifetime exceeds maximum allowed duration for security reasons.",
+    INVALID_EXPIRATION = "Invalid token expiration date.",
 
 }
 
@@ -27,7 +30,10 @@ export const TokenErrorHttpStatus: Record<TokenErrorType, number> = {
     [TokenErrorType.REFRESH_TOKEN_NOT_FOUND]: HttpStatusCodes.NOT_FOUND,
     [TokenErrorType.ERROR_WHILE_GENERATING_ACCESS_TOKEN]: HttpStatusCodes.INTERNAL_SERVER_ERROR,
     [TokenErrorType.ERROR_WHILE_GENERATING_REFRESH_TOKEN]: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-    [TokenErrorType.MISSING_SECRET]: HttpStatusCodes.INTERNAL_SERVER_ERROR
+    [TokenErrorType.MISSING_SECRET]: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+    [TokenErrorType.TOO_LONG_LIFETIME]: HttpStatusCodes.BAD_REQUEST,
+    [TokenErrorType.TOO_SHORT_LIFETIME]: HttpStatusCodes.BAD_REQUEST,
+    [TokenErrorType.INVALID_EXPIRATION]: HttpStatusCodes.BAD_REQUEST
 };
 
 /**
