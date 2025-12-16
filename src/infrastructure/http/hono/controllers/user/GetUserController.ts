@@ -3,7 +3,6 @@ import { GetUserUseCase } from "../../../../../application/usecases/user/GetUser
 import { HttpStatusCodes } from "../../../../../application/interfaces/HttpStatusCodes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DomainError } from "../../../../../application/interfaces/IDomainError";
-import { UserError, UserErrorType } from "../../../../../domain/user/enums/UserErrorType";
 
 export class GetUserController {
     constructor(
@@ -14,10 +13,6 @@ export class GetUserController {
         try {
             const { id } = c.req.param()
 
-            if (!id) {
-                throw new UserError(UserErrorType.MISSING_USER_UUID)
-            }
-            
             const user = await this.getUserUseCase.execute(id)
 
             return c.json(user, HttpStatusCodes.ACCEPTED)
