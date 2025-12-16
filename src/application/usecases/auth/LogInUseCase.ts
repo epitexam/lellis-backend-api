@@ -1,5 +1,4 @@
 import { RefreshToken } from "../../../domain/auth/entity/RefreshToken";
-import { TokenError, TokenErrorType } from "../../../domain/auth/enums/TokenErrorType";
 import { IJwtService } from "../../../domain/auth/security/IJwtService";
 import { LoginUserDTO } from "../../../domain/user/dtos/LoginUserDTO";
 import { UserError, UserErrorType } from "../../../domain/user/enums/UserErrorType";
@@ -56,17 +55,8 @@ export class LogInUseCase {
 
         const userId = existingUser!.id;
         const issueDate = new Date();
-
         const accessToken = await this.jwtService.generateAccessToken(userId);
         const refreshTokenString = await this.jwtService.generateRefreshToken(userId);
-
-        if (!accessToken) {
-            throw new TokenError(TokenErrorType.ERROR_WHILE_GENERATING_ACCESS_TOKEN)
-        }
-
-        if (!refreshTokenString) {
-            throw new TokenError(TokenErrorType.ERROR_WHILE_GENERATING_REFRESH_TOKEN)
-        }
 
         const expirationDate = this.jwtService.getRefreshTokenExpirationDate();
         const tokenRecordId = this.idProvider.generateRandomUuid();
