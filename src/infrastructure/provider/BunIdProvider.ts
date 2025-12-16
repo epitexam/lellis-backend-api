@@ -6,8 +6,4 @@ export class BunIdProvider implements IIdProvider {
         const uuid = Bun.randomUUIDv7();
         return UserId.create(uuid)
     }
-
-    generateRandomUuid(): string {
-        return Bun.randomUUIDv7();
-    }
 }
