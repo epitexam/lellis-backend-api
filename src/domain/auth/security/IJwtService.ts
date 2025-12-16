@@ -1,5 +1,3 @@
-import { UserId } from "../../user/valueObjects/UserId";
-
 /**
  * Interface representing the capabilities of the JWT service layer (Infrastructure).
  * This service handles the technical aspects of creating, signing, and validating tokens.
@@ -9,17 +7,17 @@ import { UserId } from "../../user/valueObjects/UserId";
 export interface IJwtService {
     /**
      * Generates a short-lived Access Token (JWT) signed with the server's secret.
-     * @param {UserId} userId - The identifier of the user (e.g., UUID string from the UserId value object).
+     * @param {string} userId - The identifier of the user (e.g., UUID string from the UserId value object).
      * @returns {Promise<string>} The generated Access Token string.
      */
-    generateAccessToken(userId: UserId): Promise<string>;
+    generateAccessToken(userId: string): Promise<string>;
 
     /**
      * Generates a long-lived Refresh Token (can be a signed JWT or an opaque random string).
-     * @param {UserId} userId - The identifier of the user.
+     * @param {string} userId - The identifier of the user.
      * @returns {Promise<string>} The generated Refresh Token string.
      */
-    generateRefreshToken(userId: UserId): Promise<string>;
+    generateRefreshToken(userId: string): Promise<string>;
 
     /**
      * Verifies the signature and expiration of an Access Token, and extracts its payload.
