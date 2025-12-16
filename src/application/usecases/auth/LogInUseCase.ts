@@ -10,19 +10,11 @@ import { IUserRepository } from "../../repositories/user/IUserRepository";
 
 /**
  * @class LogInUseCase
- * @description Handles the full login flow: verifies user credentials,
- * issues a new Access Token and Refresh Token, and persists the refresh token.
+ * @description Orchestrates the user authentication process, verifies credentials,
+ * and issues a new pair of Access and Refresh tokens.
  */
 export class LogInUseCase {
 
-    /**
-     * @constructor
-     * @param {IUserRepository} userRepository - Repository for accessing user data.
-     * @param {IPasswordHasher} passwordHasher - Service used to verify hashed passwords.
-     * @param {IJwtService} jwtService - Service responsible for generating JWT tokens.
-     * @param {IAuthRepository} authRepository - Repository used to store refresh tokens.
-     * @param {IIdProvider} idProvider - Provider for generating UUIDs for token records.
-     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordHasher: IPasswordHasher,
@@ -31,14 +23,6 @@ export class LogInUseCase {
         private readonly idProvider: IIdProvider
     ) { }
 
-    /**
-     * @method execute
-     * @async
-     * @description Validates user credentials and returns a pair of tokens.
-     * @param {LoginUserDTO} input - DTO containing email and password.
-     * @throws {UserError} Throws INVALID_CREDENTIALS when authentication fails.
-     * @returns {Promise<{ accessToken: string, refreshToken: string }>} The generated access and refresh tokens.
-     */
     async execute(input: LoginUserDTO) {
         const email = Email.create(input.email);
 
