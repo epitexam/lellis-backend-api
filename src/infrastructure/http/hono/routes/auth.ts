@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { CreateUserComposer } from "../../../services/user/CreateUserComposer";
 import { LoginComposer } from "../../../services/auth/LoginComposer";
+import { RefreshTokenComposer } from "../../../services/auth/RefreshTokenComposer";
 
 export const authRoutes = new Hono()
 
@@ -12,8 +13,14 @@ authRoutes.post('/register', (c) => {
 
 authRoutes.post('/login', (c) => {
     const controller = LoginComposer();
-    const udata = controller.handle(c);
-    return udata
+    const data = controller.handle(c);
+    return data
+})
+
+authRoutes.post('/refresh', (c) => {
+    const controller = RefreshTokenComposer()
+    const data = controller.handle(c);
+    return data
 })
 
 authRoutes.get('/help', (c) => {
