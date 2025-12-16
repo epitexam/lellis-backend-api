@@ -119,7 +119,7 @@ export async function bootstrapDatabase(): Promise<void> {
   try {
     console.log(`Connecting to database ${dbConfig.database} on ${dbConfig.host}...`);
     await setupDatabase();
-    monitorConnections(10000);
+    monitorConnections(2000);
 
     const handleShutdown = async () => {
       await closeDatabase();
