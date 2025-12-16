@@ -1,9 +1,22 @@
-import { Hono } from 'hono'
+import { Hono } from 'hono';
+import { authRoutes } from './infrastructure/http/hono/routes/auth';
+import { bootstrapDatabase } from './infrastructure/database/config/mysql';
+import { serve } from 'bun';
 
-const app = new Hono()
+const PORT = Number(process.env.PORT)
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
+const app = new Hono();
+
+(async () => {
+  // Space to lanche setup or config functions
+  bootstrapDatabase()
+})();
+
+app.route('/auth', authRoutes);
+
+serve({
+  fetch: app.fetch,
+  port: PORT || 3000,
 })
 
-export default app
+export default app;
