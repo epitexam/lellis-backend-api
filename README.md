@@ -1,7 +1,9 @@
 # Lellis
+
 Lellis is a secure, high-performance backend platform designed for healthcare professionals.
 It focuses on the management of sensitive medical data, collaborative workspaces, and fine-grained access control, while strictly adhering to **Clean Architecture** and **Microservices** principles.
 The project prioritizes **domain isolation**, **security**, and **scalability**, making it suitable for medical contexts with strong regulatory constraints.
+
 ---
 ## Project Overview
 Lellis aims to provide healthcare professionals (such as nurses and medical practices) with a modern and modular platform to:
