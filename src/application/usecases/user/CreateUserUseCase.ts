@@ -6,6 +6,7 @@ import { IPasswordHasher } from "../../providers/IPasswordHasher";
 import { IUserRepository } from "../../repositories/user/IUserRepository";
 import { UserError, UserErrorType } from "../../../domain/user/enums/UserErrorType";
 import { IIdProvider } from "../../providers/IIdProvider";
+import { UserId } from "../../../domain/user/valueObjects/UserId";
 
 export class CreateUserUseCase {
     /**
@@ -36,7 +37,7 @@ export class CreateUserUseCase {
         }
 
         const user = User.create({
-            id: this.idProvider.generate(),
+            id: UserId.create(this.idProvider.generate()),
             email,
             password,
             firstName: input.firstName.trim(),
