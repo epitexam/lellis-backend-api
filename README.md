@@ -1,122 +1,239 @@
 # Lellis
 
-Lellis is a secure, high-performance backend platform designed for healthcare professionals.
+Lellis is a secure, high-performance backend platform designed for healthcare professionals.  
 It focuses on the management of sensitive medical data, collaborative workspaces, and fine-grained access control, while strictly adhering to **Clean Architecture** and **Microservices** principles.
+
 The project prioritizes **domain isolation**, **security**, and **scalability**, making it suitable for medical contexts with strong regulatory constraints.
 
 ---
+
 ## Project Overview
+
 Lellis aims to provide healthcare professionals (such as nurses and medical practices) with a modern and modular platform to:
+
 - centralize patient data,
 - organize medical visits and rounds,
 - collaborate securely within structured workspaces,
 - enforce strict access control on sensitive medical information.
-Unlike existing solutions that are often rigid or overloaded, Lellis focuses on a **clear domain model**, **progressive feature development**, and a **robust authorization system** adapted to real-world medical workflows.
+
+Rather than delivering a monolithic and rigid system, Lellis is designed to evolve progressively, with a strong emphasis on **domain clarity**, **explicit security boundaries**, and **incremental complexity**.
+
 ---
+
 ## Problem Statement
+
 Healthcare professionals face multiple operational challenges:
-- daily rounds with tight scheduling constraints,
-- fragmented patient information,
-- unstructured medical documents,
-- collaboration across multiple practitioners,
+
+- daily rounds with strict scheduling constraints,
+- fragmented and poorly structured patient information,
+- unorganized medical documents,
+- collaboration between multiple practitioners and roles,
 - heavy administrative workload,
-- strict confidentiality and data protection requirements.
-Many existing tools are either too complex, insufficiently flexible, or poorly adapted to field work.
-Lellis addresses these issues by providing:
-- centralized and structured medical data,
-- collaborative workspaces (networks),
-- fine-grained authorization and auditability,
-- multi-platform support (desktop-first),
+- very high confidentiality and compliance requirements.
+
+Existing tools are often either too complex, too rigid, or insufficiently adapted to real-world medical workflows.
+
+Lellis addresses these challenges by providing:
+
+- a centralized and structured data model,
+- collaborative workspaces,
+- a robust and explicit authorization model,
+- multi-platform access (desktop-first),
 - a modern, secure, and modular backend architecture.
+
 ---
+
 ## Core Concepts
-### Users and Networks
+
+### Users and Workspaces
+
 - A **User** represents an individual account at the platform level.
-- A **Network** represents a collaborative workspace (e.g. a medical practice or team).
-- A user participates in a network through a **Network Member** context, which defines their local responsibilities and permissions.
-### Authorization Model
-Lellis uses a **RBAC (Role-Based Access Control)** model to define structural permissions.
-This approach allows expressing rules such as:
-- access to a patient record only if assigned to the visit,
-- temporary permissions during emergencies,
-- restrictions based on network membership, time, or context.
+- A **Workspace** represents a collaborative environment (e.g. a medical practice or healthcare team).
+- A user participates in a workspace through a **Workspace Member** context, which defines their local responsibilities and permissions.
+
+This separation allows the same user to belong to multiple workspaces with different roles and access levels.
+
 ---
+
+## Security Architecture – Progressive Implementation
+
+Security is a **first-class concern** in Lellis due to the sensitive medical nature of the data.  
+However, implementing a fully expressive authorization system from day one would introduce unnecessary complexity and slow down delivery.
+
+For this reason, the **Security Core is developed in two distinct phases**.
+
+---
+
+## Foundational Security Core (Deliverable)
+
+The first phase focuses on a **robust, understandable, and production-ready security foundation**.
+
+Its objectives are:
+
+- ensure strong isolation between users and workspaces,
+- provide clear role-based access control (RBAC),
+- support real-world collaboration scenarios,
+- remain simple enough to be reliably implemented and audited.
+
+### Key Characteristics
+
+- Role-Based Access Control (RBAC)
+- Explicit permissions expressed as domain value objects
+- Separation between global roles and workspace roles
+- Deterministic permission evaluation
+- Centralized audit logging
+- No contextual or attribute-based rules yet
+
+This phase deliberately avoids advanced policy engines or dynamic rules in order to guarantee **correctness, maintainability, and fast iteration**.
+
+---
+
+## Phase 1 – Security Core Class Diagram
+
+The following diagram represents the **Phase 1 Security Core domain model**, which is currently implemented and considered the stable foundation of the system.
+
+![Security Core – Phase 1](docs/security-core-phase-1.png)
+
+### Design Overview
+
+#### Security Core (RBAC)
+
+- `Role` is an abstract domain concept.
+- Roles aggregate permissions through `RolePermission`.
+- Permissions are expressed using explicit `PermissionCode` value objects.
+- Roles can evaluate permissions deterministically via `can(permissionCode)`.
+
+#### Identity Management
+
+- Users are assigned **global roles**.
+- Sessions represent authenticated contexts.
+- Global permissions apply outside of any workspace context.
+
+#### Workspace Management
+
+- Workspaces define collaborative boundaries.
+- Users interact with workspaces through `WorkspaceMember`.
+- Workspace-specific roles allow fine-grained delegation without affecting global privileges.
+
+#### Audit & Notification
+
+- All sensitive actions are auditable.
+- Audit logs preserve actor identity and optional workspace context.
+- Notifications provide feedback without exposing sensitive data.
+
+---
+
+## Phase 2 – Advanced Authorization (Planned)
+
+The second phase will extend the Security Core with **context-aware authorization** mechanisms.
+
+This phase is intentionally postponed to avoid premature complexity.
+
+Planned extensions include:
+
+- Attribute-Based Access Control (ABAC)
+- Contextual permissions (time, assignment, emergency access)
+- Medical-specific access rules (e.g. assigned caregiver)
+- Policy composition and evaluation strategies
+- Temporary and delegated permissions
+
+Phase 2 will be designed **on top of** the Phase 1 foundation, without breaking existing domain contracts.
+
+---
+
 ## Architecture Overview
-The platform is designed following **Clean Architecture** principles, with strict separation between domain logic, application services, and infrastructure concerns.
+
+Lellis follows **Clean Architecture** principles with strict separation between:
+
+- domain logic,
+- application services,
+- infrastructure and delivery mechanisms.
+
 ### High-Level Deployment Architecture
-![Deployment Diagram](docs/deployment_diagram.png)
+
+![Deployment Diagram](docs/deployment.png)
+
 Key characteristics:
+
 - desktop client built with **Tauri**,
-- web SPA and mobile app clients,
-- secure API access through an API Gateway (Hono JS, including identity and system services),
-- microservices-oriented backend (Medical Core, Document Service, Billing Service),
-- strict separation of medical data and infrastructure services.
+- API access through a centralized gateway,
+- backend services evolving toward microservices,
+- strict isolation between domain and infrastructure concerns.
+
 ---
-## Domain Model
-The domain model is centered around medical workflows while remaining independent of infrastructure and security concerns.
-![Class Diagram](docs/class_diagram.png)
-Key domain entities include:
-- patients and health records,
-- visits, rounds, and care series,
-- medical acts and documents,
-- collaborative network structures.
+
+## Domain Model Overview
+
+The medical domain is modeled independently from security and infrastructure.
+
+![Domain Class Diagram](docs/class-diagram.png)
+
+Core domain concepts include:
+
+- patients and medical records,
+- visits, rounds, and care activities,
+- documents and medical artifacts,
+- collaborative structures.
+
 ---
-## Use Cases Overview
-The platform distinguishes between **global (instance-level)** responsibilities and **network-level** medical operations.
-![Use Case Diagram](docs/global_use_case_diagram.png)
+
+## Use Case Overview
+
+The system distinguishes between **global operations** and **workspace-level medical workflows**.
+
+![Use Case Diagram](docs/usecase.png)
+
 ### Global Scope
-- user registration and authentication,
-- global administration and configuration,
-- network creation and management,
-- system monitoring and audit access.
-### Network Scope
-- patient record management,
+
+- authentication and identity management,
+- platform administration,
+- workspace lifecycle management,
+- security supervision and auditing.
+
+### Workspace Scope
+
+- patient record access,
 - visit and round planning,
-- prescription and care tracking,
-- secure document handling,
-- internal communication between members.
+- document management,
+- internal collaboration.
+
 ---
+
 ## Technology Stack
+
 ### Backend
+
 - TypeScript
 - Bun
-- Hono JS
+- HonoJS / ElysiaJS
 - PostgreSQL
 - Prisma
 - Docker
-### Client
-- Tauri (Desktop)
-- SPA (Web)
-- Mobile app
-### Infrastructure
-- Dockerized services
-- Reverse proxy (Nginx / Traefik)
-- Object storage (S3-compatible)
-- Progressive evolution toward orchestration (Docker Compose → Kubernetes)
+
+### Clients
+
+- Desktop (Tauri)
+- Web (planned)
+- Mobile (planned)
+
 ---
-## Security Considerations
-Security is a first-class concern due to the medical nature of the data:
-- strict separation of domain and infrastructure layers,
-- centralized authentication and authorization,
-- RBAC access control,
-- encrypted local storage on clients,
-- comprehensive audit logging of sensitive operations.
----
+
 ## Project Status and Roadmap
+
 ### Phase 1 – MVP
-- user and network management,
-- authorization model (RBAC foundations),
+
+- identity and workspace management,
+- foundational Security Core (RBAC),
 - stable backend API,
 - desktop client,
 - basic patient records,
-- basic planning and visits.
-Future phases will progressively introduce:
-- advanced medical workflows,
-- billing and insurance support,
-- external medical service integrations,
-- analytics and dashboards,
-- AI-assisted features.
+- basic planning features.
+
+Phase 2 will progressively introduce advanced authorization, medical workflows, and integrations.
+
 ---
+
 ## License
-This project is currently under active development.
-License details will be defined at a later stage.
+
+This project is under active development.  
+License information will be defined at a later stage.
