@@ -36,7 +36,7 @@ Existing tools are often either too complex, too rigid, or insufficiently adapte
 Lellis addresses these challenges by providing:
 
 - a centralized and structured data model,
-- collaborative workspaces (networks),
+- collaborative workspaces,
 - a robust and explicit authorization model,
 - multi-platform access (desktop-first),
 - a modern, secure, and modular backend architecture.
@@ -64,7 +64,7 @@ For this reason, the **Security Core is developed in two distinct phases**.
 
 ---
 
-## Phase 1 – Foundational Security Core (Deliverable)
+## Foundational Security Core (Deliverable)
 
 The first phase focuses on a **robust, understandable, and production-ready security foundation**.
 
