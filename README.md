@@ -197,7 +197,7 @@ The modular monolith is the **current and intended deployment model**.
 
 The microservices architecture represents a **future evolution**, not the initial implementation.
 
-![Deployment – Microservices](docs/deployment-diagram.png)
+![Deployment – Microservices](docs/deployment-diagram-microservice.png)
 
 Modules may be extracted independently when:
 
