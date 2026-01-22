@@ -136,6 +136,8 @@ The following diagram represents the **foundational Security Core domain model**
 
 The second phase will introduce **context-aware authorization**, built on top of the existing RBAC foundation.
 
+![Security Core – Phase 1](docs/security-core-v2.png)
+
 Planned extensions include:
 
 * Attribute-Based Access Control (ABAC)
