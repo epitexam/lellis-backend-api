@@ -136,6 +136,8 @@ The following diagram represents the **foundational Security Core domain model**
 
 The second phase will introduce **context-aware authorization**, built on top of the existing RBAC foundation.
 
+![Security Core – Phase 2](docs/security-core-v2.png)
+
 Planned extensions include:
 
 * Attribute-Based Access Control (ABAC)
@@ -197,7 +199,7 @@ The modular monolith is the **current and intended deployment model**.
 
 The microservices architecture represents a **future evolution**, not the initial implementation.
 
-![Deployment – Microservices](docs/deployment-diagram.png)
+![Deployment – Microservices](docs/deployment-diagram-microservice.png)
 
 Modules may be extracted independently when:
 
